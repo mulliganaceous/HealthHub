@@ -1,0 +1,138 @@
+service: hh-ai-interaction
+plugins:
+  - serverless-webpack
+custom:
+  webpack:
+    includeModules: true
+    packager: "npm"
+    excludeFiles: src/**/*.test.js
+provider:
+  name: aws
+  runtime: nodejs18.x
+  timeout: 29
+  versionFunctions: false
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  environment:
+    S3_BUCKET: hh-${self:provider.stage}-${aws:accountId}-ai-interaction
+    AI_INTERACTION_TABLE: ${self:service}-${self:provider.stage}-ai-interactions
+    DOCTOR_TABLE: hh-doctor-${self:provider.stage}-doctors
+    APPOINTMENT_TABLE: hh-appointment-${self:provider.stage}-appointments
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:DescribeTable
+        - dynamodb:DescribeTable
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - polly:SynthesizeSpeech
+        - translate:TranslateText
+        - comprehend:DetectDominantLanguage
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+        - s3:DeleteObject
+        - s3:*
+      Resource:
+        - "arn:aws:s3:::${self:provider.environment.S3_BUCKET}"
+        - "arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*"
+  httpApi:
+    id:
+      "Fn::ImportValue": HH-HttpAPI-${sls:stage}
+functions:
+  createInteraction:
+    handler: src/handlers/aiInteraction.create
+    events:
+      - httpApi:
+          path: /ai-interactions
+          method: post
+
+  getInteraction:
+    handler: src/handlers/aiInteraction.get
+    events:
+      - httpApi:
+          path: /ai-interactions/{id}
+          method: get
+
+  listInteractions:
+    handler: src/handlers/aiInteraction.list
+    events:
+      - httpApi:
+          path: /ai-interactions
+          method: get
+
+  virtualAssistant:
+    handler: src/handlers/aiInteraction.virtualAssistant
+    events:
+      - httpApi:
+          path: /ai-interactions/virtual-assistant
+          method: post
+
+  textToSpeech:
+    handler: src/handlers/aiInteraction.textToSpeech
+    events:
+      - httpApi:
+          path: /ai-interactions/text-to-speech
+          method: post
+
+resources:
+  Resources:
+    AIInteractionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.AI_INTERACTION_TABLE}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: interactionType
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserIdIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: interactionType
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+    AiInteractionBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.S3_BUCKET}
+        OwnershipControls:
+          Rules:
+            - ObjectOwnership: ObjectWriter
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+        AccessControl: Private
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - "*"
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              AllowedOrigins:
+                - "*"
+              MaxAge: 3000
