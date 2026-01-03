@@ -9,6 +9,8 @@ export const Card = ({ title, value, color }) => {
         return "bg-green-500";
       case "purple":
         return "bg-purple-500";
+      case "orange":
+        return "bg-orange-500";
       default:
         return "bg-gray-500";
     }

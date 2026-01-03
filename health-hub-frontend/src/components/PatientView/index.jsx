@@ -1,6 +1,7 @@
-import { Calendar, Home } from "lucide-react";
+import { Calendar, FileText, Home, MessageSquare } from "lucide-react";
 import React, { useState } from "react";
 import Appointments from "../Appointment";
+import MedicalRecords from "../MedicalRecords";
 import PatientDashboard from "../PatientDashboard";
 
 const MenuItem = ({ icon: Icon, label, active, onClick }) => (
@@ -22,9 +23,13 @@ const PatientView = ({ userRole, userId }) => {
     switch (activeTab) {
       case "dashboard":
         return <PatientDashboard userId={userId} />;
-
+      case "medicalRecords":
+        return <MedicalRecords userId={userId} />;
       case "appointments":
         return <Appointments userId={userId} />;
+
+      default:
+        return <PatientDashboard userId={userId} />;
     }
   };
 
@@ -41,6 +46,12 @@ const PatientView = ({ userRole, userId }) => {
             label="Dashboard"
             active={activeTab === "dashboard"}
             onClick={() => setActiveTab("dashboard")}
+          />
+          <MenuItem
+            icon={FileText}
+            label="Medical Records"
+            active={activeTab === "medicalRecords"}
+            onClick={() => setActiveTab("medicalRecords")}
           />
           <MenuItem
             icon={Calendar}

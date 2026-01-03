@@ -1,13 +1,21 @@
-import { Home } from "lucide-react";
+import { FileText, Home, VolumeX } from "lucide-react";
 import React, { useState } from "react";
+import AISpeech from "../AiSpeech";
 import DoctorDashboard from "../DoctorDashboard";
 import { MenuItem } from "../SharedComponents";
+import Transcription from "../Transcription";
 
 const DoctorView = ({ userRole }) => {
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const renderContent = () => {
     switch (activeTab) {
+      case "dashboard":
+        return <DoctorDashboard />;
+      case "speech":
+        return <AISpeech />;
+      case "transcription":
+        return <Transcription />;
       default:
         return <DoctorDashboard />;
     }
@@ -26,6 +34,18 @@ const DoctorView = ({ userRole }) => {
             label="Dashboard"
             active={activeTab === "dashboard"}
             onClick={() => setActiveTab("dashboard")}
+          />
+          <MenuItem
+            icon={VolumeX}
+            label="AI Speech"
+            active={activeTab === "speech"}
+            onClick={() => setActiveTab("speech")}
+          />
+          <MenuItem
+            icon={FileText}
+            label="Transcription"
+            active={activeTab === "transcription"}
+            onClick={() => setActiveTab("transcription")}
           />
         </div>
       </nav>

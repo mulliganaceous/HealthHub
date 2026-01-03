@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  CartesianGrid,
-  Line,
   LineChart,
-  ResponsiveContainer,
-  Tooltip,
+  Line,
   XAxis,
   YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 import {
-  appointmentService,
   doctorService,
   patientService,
+  appointmentService,
+  aiInteractionService,
 } from "../../services/api";
 import { Card } from "../SharedComponents";
 
@@ -20,21 +21,25 @@ const Dashboard = () => {
   const [totalPatients, setTotalPatients] = useState(0);
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [totalAppointments, setTotalAppointments] = useState(0);
+  const [totalAIInteractions, setTotalAIInteractions] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [patients, doctors, appointments] = await Promise.all([
-          patientService.getPatients(),
-          doctorService.getDoctors(),
-          appointmentService.getAppointments(),
-        ]);
+        const [patients, doctors, appointments, aiInteractions] =
+          await Promise.all([
+            patientService.getPatients(),
+            doctorService.getDoctors(),
+            appointmentService.getAppointments(),
+            aiInteractionService.getAIInteractions(),
+          ]);
 
         setTotalPatients(patients.data.length);
         setTotalDoctors(doctors.data.length);
         setTotalAppointments(appointments.data.length);
+        setTotalAIInteractions(aiInteractions.data.length);
 
         // Simulating data for the chart
         setData([
@@ -75,6 +80,11 @@ const Dashboard = () => {
           title="Total Appointments"
           value={totalAppointments}
           color="purple"
+        />
+        <Card
+          title="AI Interactions"
+          value={totalAIInteractions}
+          color="orange"
         />
       </div>
       <div className="bg-white p-4 rounded-lg shadow">

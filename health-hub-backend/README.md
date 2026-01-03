@@ -10,8 +10,12 @@ This guide provides instructions for setting up and deploying the HealthHub back
   - [Project Structure](#project-structure)
   - [Installation](#installation)
   - [Configuration](#configuration)
+    - [Transcription Service](#transcription-service)
   - [Deployment](#deployment)
   - [Service-Specific Notes](#service-specific-notes)
+    - [AI Interaction Service](#ai-interaction-service)
+    - [Transcription Service](#transcription-service-1)
+    - [Other Services](#other-services)
   - [Security Notes](#security-notes)
 
 ## Prerequisites
@@ -20,7 +24,7 @@ Ensure you have the following installed on your system:
 
 - Node.js (v14 or later)
 - npm (v6 or later)
-- Serverless Framework CLI (v3) (`npm install -g serverless@3`)
+- Serverless Framework CLI (`npm install -g serverless`)
 - AWS CLI (configured with your AWS credentials)
 
 ## Project Structure
@@ -33,9 +37,11 @@ health-hub-backend/
 ├── node_modules/
 ├── src/
 │   └── services/
+│       ├── ai-interaction-service/
 │       ├── appointment-service/
 │       ├── doctor-service/
 │       ├── patient-service/
+│       ├── transcription-service/
 │       └── user-service/
 ├── .gitignore
 ├── package.json
@@ -71,6 +77,18 @@ Each service in the `src/services/` directory has its own `serverless.yml` confi
 
 Each service has its own `serverless.yml` file that needs to be configured with the appropriate environment variables and credentials. Here are the specific requirements for each service:
 
+### Transcription Service
+
+In the `src/services/transcription-service/serverless.yml` file, add the Azure Speech Service credentials:
+
+```yaml
+environment:
+  AZURE_SPEECH_KEY: "your-azure-speech-key"
+  AZURE_SPEECH_REGION: "your-azure-speech-region"
+```
+
+Replace `"your-azure-speech-key"` and `"your-azure-speech-region"` with your actual Azure Speech Service key and region.
+
 ## Deployment
 
 Before deploying, ensure that all the necessary credentials and environment variables are properly set in each service's `serverless.yml` file.
@@ -82,6 +100,17 @@ npm run deploy
 ```
 
 ## Service-Specific Notes
+
+### AI Interaction Service
+
+- Integrates with text-to-speech capabilities
+
+### Transcription Service
+
+- Leverages Azure Speech Service for speech-to-text functionality
+- Needs Azure credentials properly configured
+
+### Other Services
 
 - appointment-service: Manages appointment scheduling and retrieval
 - doctor-service: Handles doctor-related operations

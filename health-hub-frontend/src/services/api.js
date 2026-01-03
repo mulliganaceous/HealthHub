@@ -48,4 +48,25 @@ export const appointmentService = {
   deleteAppointment: (id) => api.delete(`/appointments/${id}`),
 };
 
+export const transcriptionService = {
+  getTranscriptions: () => api.get("/transcriptions"),
+  getTranscription: (id) => api.get(`/transcriptions/${id}`),
+  createTranscription: (data) => api.post("/transcriptions", data),
+  updateTranscription: (id, data) => api.put(`/transcriptions/${id}`, data),
+  deleteTranscription: (id) => api.delete(`/transcriptions/${id}`),
+  transcribeAudio: (formData) =>
+    api.post("/transcriptions/transcribe", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }),
+};
+export const aiInteractionService = {
+  getAIInteractions: (params) => api.get("/ai-interactions", params),
+  getAIInteraction: (id) => api.get(`/ai-interactions/${id}`),
+  createAIInteraction: (data) => api.post("/ai-interactions", data),
+  textToSpeech: (text, language) =>
+    api.post("/ai-interactions/text-to-speech", { text, language }),
+};
+
 export default api;
