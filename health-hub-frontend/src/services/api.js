@@ -61,7 +61,19 @@ export const transcriptionService = {
       },
     }),
 };
+
+export const medicalImageService = {
+  getMedicalImages: () => api.get("/medical-images"),
+  getMedicalImage: (id) => api.get(`/medical-images/${id}`),
+  uploadMedicalImage: (data) => api.post("/medical-images", data),
+  updateMedicalImage: (id, data) => api.put(`/medical-images/${id}`, data),
+  deleteMedicalImage: (id) => api.delete(`/medical-images/${id}`),
+  analyzeMedicalImage: (id) => api.post(`/medical-images/${id}/analyze`),
+};
+
 export const aiInteractionService = {
+  virtualAssistant: (query, userId) =>
+    api.post("/ai-interactions/virtual-assistant", { query, userId }),
   getAIInteractions: (params) => api.get("/ai-interactions", params),
   getAIInteraction: (id) => api.get(`/ai-interactions/${id}`),
   createAIInteraction: (data) => api.post("/ai-interactions", data),

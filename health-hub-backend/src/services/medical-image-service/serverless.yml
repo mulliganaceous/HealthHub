@@ -1,7 +1,14 @@
-service: hh-ai-interaction
+service: hh-medical-image
 plugins:
   - serverless-webpack
+  - serverless-s3-cleaner
+
 custom:
+  serverless-s3-cleaner:
+    # Names of buckets to remove before a stack is removed, or via 'sls s3remove' command
+    buckets:
+      - ${self:provider.environment.S3_BUCKET}
+
   webpack:
     includeModules: true
     packager: "npm"
@@ -14,12 +21,11 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
   environment:
-    OPEN_AI_KEY: "sk-proj"
-    ASSISTANT_ID: "asst_YFxbCiOZeljaGkFTchDD7VVL"
-    S3_BUCKET: hh-${self:provider.stage}-${aws:accountId}-ai-interaction
-    AI_INTERACTION_TABLE: ${self:service}-${self:provider.stage}-ai-interactions
-    DOCTOR_TABLE: hh-doctor-${self:provider.stage}-doctors
-    APPOINTMENT_TABLE: hh-appointment-${self:provider.stage}-appointments
+    MEDICAL_IMAGE_TABLE: ${self:service}-${self:provider.stage}-medical-images
+    S3_BUCKET: hh-${self:provider.stage}-${aws:accountId}-medical-images
+    GOOGLE_PROJECT_ID: ${file(./google-credentials.json):project_id}
+    GOOGLE_PRIVATE_KEY: ${file(./google-credentials.json):private_key}
+    GOOGLE_CLIENT_EMAIL: ${file(./google-credentials.json):client_email}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -30,14 +36,7 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
         - dynamodb:DescribeTable
-        - dynamodb:DescribeTable
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - polly:SynthesizeSpeech
-        - translate:TranslateText
-        - comprehend:DetectDominantLanguage
-      Resource: "*"
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.MEDICAL_IMAGE_TABLE}"
     - Effect: Allow
       Action:
         - s3:PutObject
@@ -51,68 +50,71 @@ provider:
     id:
       "Fn::ImportValue": HH-HttpAPI-${sls:stage}
 functions:
-  createInteraction:
-    handler: src/handlers/aiInteraction.create
+  uploadImage:
+    handler: src/handlers/medicalImage.upload
     events:
       - httpApi:
-          path: /ai-interactions
+          path: /medical-images
           method: post
 
-  getInteraction:
-    handler: src/handlers/aiInteraction.get
+  getImage:
+    handler: src/handlers/medicalImage.get
     events:
       - httpApi:
-          path: /ai-interactions/{id}
+          path: /medical-images/{id}
           method: get
 
-  listInteractions:
-    handler: src/handlers/aiInteraction.list
+  updateImage:
+    handler: src/handlers/medicalImage.update
     events:
       - httpApi:
-          path: /ai-interactions
+          path: /medical-images/{id}
+          method: put
+
+  deleteImage:
+    handler: src/handlers/medicalImage.del
+    events:
+      - httpApi:
+          path: /medical-images/{id}
+          method: delete
+
+  listImages:
+    handler: src/handlers/medicalImage.list
+    events:
+      - httpApi:
+          path: /medical-images
           method: get
 
-  virtualAssistant:
-    handler: src/handlers/aiInteraction.virtualAssistant
+  analyzeImage:
+    handler: src/handlers/medicalImage.analyze
     events:
       - httpApi:
-          path: /ai-interactions/virtual-assistant
-          method: post
-
-  textToSpeech:
-    handler: src/handlers/aiInteraction.textToSpeech
-    events:
-      - httpApi:
-          path: /ai-interactions/text-to-speech
+          path: /medical-images/{id}/analyze
           method: post
 
 resources:
   Resources:
-    AIInteractionsTable:
+    MedicalImagesTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.AI_INTERACTION_TABLE}
+        TableName: ${self:provider.environment.MEDICAL_IMAGE_TABLE}
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
-          - AttributeName: userId
-            AttributeType: S
-          - AttributeName: interactionType
+          - AttributeName: patientId
             AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: UserIdIndex
+          - IndexName: PatientIdIndex
             KeySchema:
-              - AttributeName: userId
+              - AttributeName: patientId
                 KeyType: HASH
-              - AttributeName: interactionType
-                KeyType: RANGE
             Projection:
               ProjectionType: ALL
         BillingMode: PAY_PER_REQUEST
-    AiInteractionBucket:
+    MedicalImagesBucket:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:provider.environment.S3_BUCKET}

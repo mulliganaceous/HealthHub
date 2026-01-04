@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Appointments from "../Appointment";
 import MedicalRecords from "../MedicalRecords";
 import PatientDashboard from "../PatientDashboard";
+import VirtualAssistant from "../VirtualAssistant";
 
 const MenuItem = ({ icon: Icon, label, active, onClick }) => (
   <div
@@ -27,7 +28,8 @@ const PatientView = ({ userRole, userId }) => {
         return <MedicalRecords userId={userId} />;
       case "appointments":
         return <Appointments userId={userId} />;
-
+      case "virtualAssistant":
+        return <VirtualAssistant userId={userId} />;
       default:
         return <PatientDashboard userId={userId} />;
     }
@@ -58,6 +60,12 @@ const PatientView = ({ userRole, userId }) => {
             label="Appointments"
             active={activeTab === "appointments"}
             onClick={() => setActiveTab("appointments")}
+          />
+          <MenuItem
+            icon={MessageSquare}
+            label="Virtual Assistant"
+            active={activeTab === "virtualAssistant"}
+            onClick={() => setActiveTab("virtualAssistant")}
           />
         </div>
       </nav>
