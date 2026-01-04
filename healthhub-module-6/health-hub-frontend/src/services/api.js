@@ -61,6 +61,16 @@ export const transcriptionService = {
       },
     }),
 };
+
+export const medicalImageService = {
+  getMedicalImages: () => api.get("/medical-images"),
+  getMedicalImage: (id) => api.get(`/medical-images/${id}`),
+  uploadMedicalImage: (data) => api.post("/medical-images", data),
+  updateMedicalImage: (id, data) => api.put(`/medical-images/${id}`, data),
+  deleteMedicalImage: (id) => api.delete(`/medical-images/${id}`),
+  analyzeMedicalImage: (id) => api.post(`/medical-images/${id}/analyze`),
+};
+
 export const aiInteractionService = {
   getAIInteractions: (params) => api.get("/ai-interactions", params),
   getAIInteraction: (id) => api.get(`/ai-interactions/${id}`),
@@ -68,5 +78,4 @@ export const aiInteractionService = {
   textToSpeech: (text, language) =>
     api.post("/ai-interactions/text-to-speech", { text, language }),
 };
-
 export default api;

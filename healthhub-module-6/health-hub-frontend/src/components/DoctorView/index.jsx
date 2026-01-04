@@ -1,9 +1,10 @@
-import { FileText, Home, VolumeX } from "lucide-react";
 import React, { useState } from "react";
-import AISpeech from "../AiSpeech";
+import { Home, VolumeX, FileText, Image } from "lucide-react";
 import DoctorDashboard from "../DoctorDashboard";
-import { MenuItem } from "../SharedComponents";
+import AISpeech from "../AiSpeech";
 import Transcription from "../Transcription";
+import ImageAnalysis from "../ImageAnalysis";
+import { MenuItem } from "../SharedComponents";
 
 const DoctorView = ({ userRole }) => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -16,6 +17,8 @@ const DoctorView = ({ userRole }) => {
         return <AISpeech />;
       case "transcription":
         return <Transcription />;
+      case "image":
+        return <ImageAnalysis />;
       default:
         return <DoctorDashboard />;
     }
@@ -46,6 +49,12 @@ const DoctorView = ({ userRole }) => {
             label="Transcription"
             active={activeTab === "transcription"}
             onClick={() => setActiveTab("transcription")}
+          />
+          <MenuItem
+            icon={Image}
+            label="Image Analysis"
+            active={activeTab === "image"}
+            onClick={() => setActiveTab("image")}
           />
         </div>
       </nav>

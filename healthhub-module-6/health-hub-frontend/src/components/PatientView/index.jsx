@@ -1,4 +1,4 @@
-import { Calendar, FileText, Home, MessageSquare } from "lucide-react";
+import { Calendar, FileText, Home } from "lucide-react";
 import React, { useState } from "react";
 import Appointments from "../Appointment";
 import MedicalRecords from "../MedicalRecords";

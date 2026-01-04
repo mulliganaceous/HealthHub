@@ -114,7 +114,6 @@ export const transcribeAudio: APIGatewayProxyHandler = async (event) => {
     }
     const audioFile = file;
     const language = fields?.language || "en-US";
-
     if (!audioFile) {
       return {
         statusCode: 400,

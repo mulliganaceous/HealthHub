@@ -4,19 +4,13 @@ This guide provides instructions for setting up and deploying the HealthHub back
 
 ## Table of Contents
 
-- [HealthHub Serverless Installation and Setup Guide](#healthhub-serverless-installation-and-setup-guide)
-  - [Table of Contents](#table-of-contents)
-  - [Prerequisites](#prerequisites)
-  - [Project Structure](#project-structure)
-  - [Installation](#installation)
-  - [Configuration](#configuration)
-    - [Transcription Service](#transcription-service)
-  - [Deployment](#deployment)
-  - [Service-Specific Notes](#service-specific-notes)
-    - [AI Interaction Service](#ai-interaction-service)
-    - [Transcription Service](#transcription-service-1)
-    - [Other Services](#other-services)
-  - [Security Notes](#security-notes)
+1. [Prerequisites](#prerequisites)
+2. [Project Structure](#project-structure)
+3. [Installation](#installation)
+4. [Configuration](#configuration)
+5. [Deployment](#deployment)
+6. [Running Locally](#running-locally)
+7. [Service-Specific Notes](#service-specific-notes)
 
 ## Prerequisites
 
@@ -40,6 +34,7 @@ health-hub-backend/
 │       ├── ai-interaction-service/
 │       ├── appointment-service/
 │       ├── doctor-service/
+│       ├── medical-image-service/
 │       ├── patient-service/
 │       ├── transcription-service/
 │       └── user-service/
@@ -77,6 +72,14 @@ Each service in the `src/services/` directory has its own `serverless.yml` confi
 
 Each service has its own `serverless.yml` file that needs to be configured with the appropriate environment variables and credentials. Here are the specific requirements for each service:
 
+### Medical Image Service
+
+1. Enable the Cloud Vision API in the Google Cloud Console for your project.
+
+2. Generate a service account key (JSON) with permissions to access the Cloud Vision API.
+
+3. Save the JSON key file as `google-credentials.json` in the `src/services/medical-image-service/` directory.
+
 ### Transcription Service
 
 In the `src/services/transcription-service/serverless.yml` file, add the Azure Speech Service credentials:
@@ -105,6 +108,11 @@ npm run deploy
 
 - Integrates with text-to-speech capabilities
 
+### Medical Image Service
+
+- Utilizes Google Cloud Vision API for image analysis
+- Requires proper setup of Google Cloud credentials
+
 ### Transcription Service
 
 - Leverages Azure Speech Service for speech-to-text functionality
@@ -123,6 +131,7 @@ Each of these services should have their specific configurations in their respec
 
 - Never commit sensitive information like API keys or credential files to version control.
 - For production deployments, consider using AWS Secrets Manager or Parameter Store to securely manage your credentials and API keys.
+- Ensure that the `google-credentials.json` file is added to your `.gitignore` to prevent accidental commits.
 - Regularly rotate your API keys and update them in your serverless configurations.
 - Implement proper IAM roles and policies to restrict access to AWS resources.
 
