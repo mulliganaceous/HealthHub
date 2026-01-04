@@ -200,7 +200,6 @@ export class MedicalImageService {
       if (labels && labels.length > 0) {
         const topLabels: any = labels
           .sort((a, b) => (b.score || 0) - (a.score || 0))
-          .slice(0, 5)
           .map((label) => ({
             description: label.description,
             confidence: label.score ? (label.score * 100).toFixed(2) : 0,
@@ -217,7 +216,7 @@ export class MedicalImageService {
       } else {
         return {
           //@ts-ignore
-          detectedConditions: false,
+          detectedConditions: true,
           message: "No conditions detected",
         };
       }

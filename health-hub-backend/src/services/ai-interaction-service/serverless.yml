@@ -14,8 +14,8 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
   environment:
-    OPEN_AI_KEY: "your-openai-key"
-    ASSISTANT_ID: "your-assistant-id"
+    OPEN_AI_KEY: "sk-proj"
+    ASSISTANT_ID: "asst_YFxbCiOZeljaGkFTchDD7VVL"
     S3_BUCKET: hh-${self:provider.stage}-${aws:accountId}-ai-interaction
     AI_INTERACTION_TABLE: ${self:service}-${self:provider.stage}-ai-interactions
     DOCTOR_TABLE: hh-doctor-${self:provider.stage}-doctors

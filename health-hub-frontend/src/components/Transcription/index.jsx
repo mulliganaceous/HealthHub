@@ -10,10 +10,12 @@ const Transcription = () => {
   const [audioFile, setAudioFile] = useState(null);
   const [selectedPatient, setSelectedPatient] = useState("");
   const [language, setLanguage] = useState("en-US");
+  const [fileType, setFileType] = useState("-");
 
   const isWavFile = (file) => {
+    setFileType(file.type);
     return (
-      file.type === "audio/wav" && file.name.toLowerCase().endsWith(".wav")
+      file.name.toLowerCase().endsWith(".wav")
     );
   };
 
@@ -176,7 +178,7 @@ const Transcription = () => {
             onClick={handleTranscribe}
             disabled={isTranscribing || !audioFile}
           >
-            {isTranscribing ? "Transcribing..." : "Transcribe Audio"}
+            {isTranscribing ? {fileType} : "Transcribe Audio"}
           </button>
           <button
             className={`${
