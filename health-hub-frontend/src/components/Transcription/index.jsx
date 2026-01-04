@@ -10,10 +10,12 @@ const Transcription = () => {
   const [audioFile, setAudioFile] = useState(null);
   const [selectedPatient, setSelectedPatient] = useState("");
   const [language, setLanguage] = useState("en-US");
+  const [filetype, setFileType] = useState("-");
 
   const isWavFile = (file) => {
+    setFileType(file.type);
     return (
-      file.type === "audio/wav" && file.name.toLowerCase().endsWith(".wav")
+      file.type === "audio/vnd.wave" && file.name.toLowerCase().endsWith(".wav")
     );
   };
 
@@ -21,14 +23,14 @@ const Transcription = () => {
     const file = event.target.files[0];
     if (file) {
       if (!isWavFile(file)) {
-        alert("Please upload a WAV file.");
+        alert("Please upload a WAV file. (" + file.type + ")");
         event.target.value = null; // Reset the input
         return;
       }
 
       const fileSizeInMB = file.size / (1024 * 1024);
-      if (fileSizeInMB > 5) {
-        alert("File size exceeds 5MB. Please choose a smaller file.");
+      if (fileSizeInMB > 6666) {
+        alert("File size exceeds 6666MB. Please choose a smaller file.");
         event.target.value = null; // Reset the input
       } else {
         setAudioFile(file);
@@ -176,7 +178,7 @@ const Transcription = () => {
             onClick={handleTranscribe}
             disabled={isTranscribing || !audioFile}
           >
-            {isTranscribing ? "Transcribing..." : "Transcribe Audio"}
+            {isTranscribing ? filetype : "Transcribe Audio"}
           </button>
           <button
             className={`${
