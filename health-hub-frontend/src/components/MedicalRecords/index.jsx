@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { transcriptionService, aiInteractionService } from "../../services/api";
+import {
+  transcriptionService,
+  medicalImageService,
+  aiInteractionService,
+} from "../../services/api";
 
 const MedicalRecords = ({ userId }) => {
   const [transcriptions, setTranscriptions] = useState([]);
+  const [medicalImages, setMedicalImages] = useState([]);
   const [aiSpeech, setAiSpeech] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -10,8 +15,13 @@ const MedicalRecords = ({ userId }) => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [transcriptionsResponse, aiSpeechResponse] = await Promise.all([
+        const [
+          transcriptionsResponse,
+          medicalImagesResponse,
+          aiSpeechResponse,
+        ] = await Promise.all([
           transcriptionService.getTranscriptions({ patientId: userId }),
+          medicalImageService.getMedicalImages({ patientId: userId }),
           aiInteractionService.getAIInteractions({
             params: {
               userId,
@@ -20,6 +30,7 @@ const MedicalRecords = ({ userId }) => {
           }),
         ]);
         setTranscriptions(transcriptionsResponse.data);
+        setMedicalImages(medicalImagesResponse.data);
         setAiSpeech(aiSpeechResponse.data);
       } catch (error) {
         console.error("Error fetching medical records:", error);
@@ -95,6 +106,54 @@ const MedicalRecords = ({ userId }) => {
           </ul>
         ) : (
           <p className="text-gray-600">No transcriptions available</p>
+        )}
+      </div>
+
+      {/* Medical Images Section */}
+      <div className="bg-white p-4 rounded-lg shadow">
+        <h3 className="text-lg font-semibold mb-2">Medical Images</h3>
+        {medicalImages.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {medicalImages.map((image) => (
+              <div key={image.id} className="border rounded-lg overflow-hidden">
+                <div className="aspect-w-1 aspect-h-1">
+                  <img
+                    src={image.imageUrl}
+                    alt="Medical"
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+                <div className="p-2">
+                  <p className="text-sm text-gray-600">
+                    Date: {new Date(image.uploadedAt).toLocaleDateString()}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Type: {image.imageType}
+                  </p>
+                  {image.analysisResults && (
+                    <div className="mt-2">
+                      <p className="text-sm font-semibold">Analysis Results:</p>
+                      {image.analysisResults.map((result, index) => (
+                        <div key={index} className="mt-1">
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className="bg-blue-600 h-2 rounded-full"
+                              style={{ width: `${result.confidence}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-xs text-gray-600">
+                            {result.description}: {result.confidence}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600">No medical images available</p>
         )}
       </div>
     </div>
