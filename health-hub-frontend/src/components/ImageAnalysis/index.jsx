@@ -75,12 +75,12 @@ const ImageAnalysis = () => {
             } else {
               setAnalysisResults(analysisResponse.data.conditions);
               setAnalysisMessage(
-                "Analysis complete. Here are the detected conditions:"
+                "Analysis complete. Here are the top 5 detected conditions:"
               );
             }
-          } catch (analysisError) {
-            console.error("Error analyzing image:", analysisError);
-            setAnalysisMessage("Failed to analyze image. Please try again. * " + analysisError + " *");
+          } catch (uploadError) {
+            console.error("Error analyzing image:", uploadError);
+            setAnalysisMessage("Failed to analyze image! Please try again.");
           } finally {
             setIsAnalyzing(false);
           }

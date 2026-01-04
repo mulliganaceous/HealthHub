@@ -113,7 +113,7 @@ export const analyze: APIGatewayProxyHandler = async (event) => {
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Could not analyze medical image" }),
+      body: JSON.stringify({ error: error }),
     };
   }
 };

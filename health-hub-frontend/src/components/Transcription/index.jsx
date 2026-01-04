@@ -178,7 +178,7 @@ const Transcription = () => {
             onClick={handleTranscribe}
             disabled={isTranscribing || !audioFile}
           >
-            {isTranscribing ? {fileType} : "Transcribe Audio"}
+            {isTranscribing ? fileType : "Transcribe Audio"}
           </button>
           <button
             className={`${
